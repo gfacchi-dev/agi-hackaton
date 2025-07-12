@@ -1,37 +1,12 @@
-Date of Service: 10/20/2023
-Patient Name: Jane Doe
-DOB: 04/12/1983 (Age: 40)
-MRN: patient-001
-Sex: Female
-Clinic: Stanford Dermatology - Outpatient
-Referral Reason: Evaluation of changing pigmented lesion
-Chief Complaint
-Evaluation of a pigmented lesion on the upper left shoulder that has changed.
-History of Present Illness
-40-year-old female with a lesion on the left shoulder: irregular borders, color variation, enlargement
-No pain or itching.
-Review of Systems
-•⁠  ⁠General: No fever, weight loss.
-•⁠  ⁠Skin: Evolving lesion, no pain or bleeding.
-Problem List
-Type 2 Diabetes Mellitus, diagnosed 2019.
-Medications
-Metformin 500 mg BID with food.
-Allergies
-Penicillin - rash.
-Vital Signs
-BP: 132/88 mmHg.
-Laboratory Data
-HbA1c: 7.2% on 10/15/2023
-CMP normal.
-Past Medical History
-Type 2 Diabetes.
-Procedures
-Colonoscopy on 07/01/2022.
-Immunizations
-COVID-19 vaccine (Moderna), 03/20/2021.
-Assessment and Plan
-Suspicious lesion
-Refer to dermatology for semi-urgent evaluation
-Consider biopsy
-Continue DM management.
+Patient Summary
+The patient is concerned about a lesion on their upper left shoulder that has changed in appearance, including uneven edges, patchy color, and possible size increase. There is no reported pain, but occasional itching.
+
+Image Assessment
+The lesion exhibits irregular, uneven borders and a mottled, patchy color distribution. The lesion's diameter appears to be approximately 1.5 cm.
+
+Differential Diagnosis
+Melanoma
+Benign Nevus with atypical features
+Seborrheic Keratosis
+Triage Recommendation
+Dermatology referral (semi-urgent). The lesion has irregular borders and color variation, raising suspicion for melanoma or a dysplastic nevus. It is crucial to rule out malignancy through a skin biopsy.
