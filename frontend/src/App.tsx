@@ -10,6 +10,7 @@ function App() {
     { sender: 'bot', text: 'Hello! How can I help you today?' }
   ])
   const [input, setInput] = useState('')
+  const [isBotTyping, setIsBotTyping] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -22,10 +23,12 @@ function App() {
     if (!input.trim()) return
     setMessages([...messages, { sender: 'user', text: input }])
     setInput('')
-    // Simulate bot response
+    setIsBotTyping(true)
+    // Simulate bot response with longer delay
     setTimeout(() => {
       setMessages(msgs => [...msgs, { sender: 'bot', text: "I'm just a demo bot!" }])
-    }, 700)
+      setIsBotTyping(false)
+    }, 1800)
   }
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,9 +46,9 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0a183d] via-[#142850] to-[#27496d] text-white font-sans relative animate-fadeIn">
       {/* Header */}
-      <header className="w-full flex justify-center items-center py-8 mb-2 animate-fadeInDown relative">
+      <header className="w-full flex justify-between items-center py-8 mb-2 animate-fadeInDown px-8 relative z-20 sticky top-0 bg-transparent">
         <div className="flex items-center gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" className="w-10 h-10">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" className="w-12 h-12">
             <circle cx="32" cy="32" r="32" fill="#142850"/>
             <ellipse cx="32" cy="38" rx="16" ry="10" fill="#fff" fillOpacity="0.9"/>
             <ellipse cx="32" cy="28" rx="10" ry="10" fill="#fff"/>
@@ -53,16 +56,13 @@ function App() {
             <rect x="28" y="24" width="8" height="2" rx="1" fill="#fff"/>
             <rect x="30" y="30" width="4" height="2" rx="1" fill="#fff"/>
           </svg>
-          <span className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">MedMind</span>
+          <span className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent drop-shadow-lg select-none">MedMind</span>
         </div>
-        {/* User icon and menu */}
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          <button className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#27496d" className="w-7 h-7">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a7.5 7.5 0 1115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75v-.75z" />
-            </svg>
-          </button>
-        </div>
+        <button className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-white focus:outline-none focus:ring-2 focus:ring-blue-200 transition hover:scale-105">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#27496d" className="w-7 h-7">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a7.5 7.5 0 1115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75v-.75z" />
+          </svg>
+        </button>
       </header>
       {/* Welcome message */}
       <div className="w-full flex justify-center animate-fadeIn mb-4">
@@ -91,11 +91,21 @@ function App() {
               )}
             </div>
           ))}
+          {isBotTyping && (
+            <div className="flex justify-start">
+              <div className="max-w-[70%] px-5 py-3 rounded-3xl shadow-xl text-base break-words bg-[#1a2947] text-white flex items-center gap-2 animate-fadeIn">
+                <span className="inline-block w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0ms'}}></span>
+                <span className="inline-block w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '150ms'}}></span>
+                <span className="inline-block w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '300ms'}}></span>
+                <span className="ml-2 text-sm text-gray-300">MedMind is typing...</span>
+              </div>
+            </div>
+          )}
           <div ref={chatEndRef} />
         </div>
       </div>
       {/* Floating prompt bar */}
-      <form onSubmit={handleSend} className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-xl flex items-center gap-2 px-4 z-10 animate-fadeInUp">
+      <form onSubmit={handleSend} className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-xl flex items-center gap-2 px-4 z-10 animate-fadeInUp pointer-events-auto">
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}

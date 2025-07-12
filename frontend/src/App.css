@@ -12,3 +12,10 @@
 .animate-fadeInDown {
   animation: fadeInDown 1s cubic-bezier(0.4,0,0.2,1);
 }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
