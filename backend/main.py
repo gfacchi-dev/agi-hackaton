@@ -97,39 +97,57 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Define the LangChain prompt
             prompt = PromptTemplate(
-                input_variables=["current_report", "previous_questions"],
-                template="""
-                You are a helpful medical assistant. Your role is to interact with the patient to complete a clinical pre-chart in concise clinical assessment documentation (CCAD) format for a physician.
+                input_variables=["current_report", "previous_questions", "latest_patient_response"],
+                template="""You are a helpful medical assistant. Your role is to complete a clinical pre-chart in concise clinical assessment documentation (CCAD) format for a physician.
 
-You already have a partially completed pre-chart report based on prior information.
+You have a partially completed report:
 
 <report>
 {current_report}
 </report>
 
-Here are the previous questions you have already asked the patient:
+Previously asked questions:
 {previous_questions}
 
-Your task is to identify what additional information is needed to make the report complete, medically useful, and ready for physician review.
+The patient just said:
+{latest_patient_response}
 
-⚠️ You must follow these strict rules:
+Your task is to update the report and decide if further information is needed.
 
-1. You must preserve and continue the structure, style, and content categories used in the current report — do not add, remove, or rename sections.
-2. Only include **confirmed or directly inferred information** in the updated report.
-3. Do **not** add hypothetical plans, future actions, placeholders like "[information needed]", or questions in the report.
-4. If no new information is available for a section, simply leave that section unchanged.
-5. Then, propose **one clear and specific question** for the patient to fill in the most relevant gap in the report.
+Follow these strict rules:
 
-Your response must strictly follow this format:
+1. Only update content within the existing sections. Do not add new sections, summaries, or reorder anything.
+2. Only include facts directly confirmed by the patient or safely inferred. No assumptions or placeholders.
+3. Use plain, patient-friendly language. Avoid clinical jargon, diagnostic terms, or frameworks like ABCDE.
+4. No future plans, interpretations, or medical advice.
+5. If the report is incomplete, ask one atomic, plain-language question (no multi-part or compound questions).
+6. If the report is complete and ready for physician review, state that no further questions are needed.
+
+Respond in one of these formats:
+
+---
+
+✅ If new info was added and more is needed:
 
 <report>
-[Updated report: only confirmed facts, no assumptions or placeholders; structure and order must match the original]
+[Updated report: only new confirmed info added to existing sections]
 </report>
 
 <question>
-[Exactly one clear, specific question for the patient — no multi-part or compound questions]
+[One specific, plain-language question]
 </question>
-                """
+
+---
+
+✅ If the report is now complete:
+
+<report>
+[Final, complete report — structure preserved, all info confirmed]
+</report>
+
+<question>
+None. The pre-chart is complete and ready for physician review.
+</question>"""
             )
 
             # Set up LangChain chain using LCEL
@@ -140,13 +158,18 @@ Your response must strictly follow this format:
             # Run the chain
             result = await chain.ainvoke({
                 "current_report": current_report,
-                "previous_questions": "\n".join(previous_questions)
+                "previous_questions": "\n".join(previous_questions),
+                "latest_patient_response": patient_response
             })
 
-            # Update state
-            current_report = result["report"]
+            # The LLM returns a string with literal '\n' characters. Replace them with actual newlines.
+            # Then, replace single newlines with double newlines to ensure proper markdown paragraph rendering.
+            formatted_report = result["report"].replace('\\n', '\n').replace('\n', '\n\n')
             next_question = result["question"]
             previous_questions.append(next_question)
+
+            # Update state
+            current_report = formatted_report
 
             # Send clean JSON back to client
             response_data = {
