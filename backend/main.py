@@ -12,6 +12,7 @@ import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
 import json
 import re
+import time
 
 class PreChartParser(BaseOutputParser):
     def parse(self, text: str) -> dict:
@@ -89,6 +90,22 @@ async def websocket_endpoint(websocket: WebSocket):
             # Receive a new message from the frontend (e.g. patient's answer)
             patient_response = await websocket.receive_text()
             print(f"\n[Backend] Received patient response: {patient_response}")
+
+            if patient_response == "start":
+                current_report = text  # Reset the report to initial state
+                previous_questions = []
+                continue
+
+            if patient_response == "FAKE":
+                response_data = {
+                    "report": current_report, # Send the cleaned and stored report
+                    "question": "Happy to help you! Please provide me with an image showing your symptoms and provide some details about your condition."
+                }
+                
+                print(f"FAKE TRIGGERED")
+                time.sleep(4)
+                await websocket.send_text(json.dumps(response_data))
+                continue
 
             # Append the previous question and patient answer for context
             if previous_questions:
@@ -176,6 +193,7 @@ That’s all the information needed before your visit. Would you like me to sche
                 "report": current_report, # Send the cleaned and stored report
                 "question": next_question
             }
+
             print(f"[Backend] Sending data to client: {json.dumps(response_data, indent=2)}")
             await websocket.send_text(json.dumps(response_data))
 

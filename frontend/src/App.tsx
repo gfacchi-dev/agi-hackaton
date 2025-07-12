@@ -127,20 +127,41 @@ function App() {
             <div className="flex flex-row gap-6">
               <button
                 className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-                onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to contact my doctor.' }]); setIsBotTyping(true); }}
+                onClick={() => {
+                  setShowPromptBar(true);
+                  setMessages([...messages, { sender: 'user', text: 'I want to contact my doctor.' }]);
+                  setIsBotTyping(true);
+                  if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                    ws.current.send('FAKE');
+                  }
+                }}
               >
                 Contact doctor
               </button>
               <button
                 className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-                onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to view my lab results.' }]); setIsBotTyping(true); }}
+                onClick={() => {
+                  setShowPromptBar(true);
+                  setMessages([...messages, { sender: 'user', text: 'I want to view my lab results.' }]);
+                  setIsBotTyping(true);
+                  if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                    ws.current.send('FAKE');
+                  }
+                }}
               >
                 View results
               </button>
             </div>
             <button
               className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-              onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to refill my prescriptions.' }]); setIsBotTyping(true); }}
+              onClick={() => {
+                setShowPromptBar(true);
+                setMessages([...messages, { sender: 'user', text: 'I want to refill my prescriptions.' }]);
+                setIsBotTyping(true);
+                if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                  ws.current.send('FAKE');
+                }
+              }}
             >
               Refill prescriptions
             </button>
