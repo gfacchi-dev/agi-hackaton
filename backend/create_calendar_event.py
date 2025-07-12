@@ -11,6 +11,13 @@ tools = composio_toolset.get_tools(actions=['GOOGLECALENDAR_CREATE_EVENT'])
 
 agent = create_openai_functions_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-task = "your task description here"
-result = agent_executor.invoke({"input": task})
-print(result)
+
+def create_calendar_event(task: str) -> str:
+    result = agent_executor.invoke({"input": task})
+    return result
+
+
+if __name__ == "__main__":
+    task = "Create a calendar event for a meeting with John Doe on March 15, 2024, at 10 AM."
+    response = create_calendar_event(task)
+    print(response)
