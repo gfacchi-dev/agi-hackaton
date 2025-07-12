@@ -1,5 +1,4 @@
 from ollama import chat
-from ollama import ChatResponse
 import json
 
 def main():
@@ -12,7 +11,7 @@ def main():
 
     # Engineer the prompt
     prompt = f"""
-    You are a helpful medical assistant. Your task is to generate a pre-chart summary for a physician.
+    You are a helpful medical assistant. Your task is to generate a pre-chart summary in concise clinical assessment documentation (ccad) format for a physician.
     Here is the available patient information.
 
     First, a consultation note regarding a skin lesion:
@@ -22,7 +21,7 @@ def main():
 
     Second, the patient's electronic health record data in FHIR format:
     ---
-    {json.dumps(fhir_data, indent=2)}
+    {json.dumps(fhir_data)}
     ---
 
     Please generate a concise and medically relevant pre-chart report. The report should include:
@@ -37,15 +36,17 @@ def main():
     Organize the output clearly with headings for each section.
     """
 
-    response: ChatResponse = chat(model='alibayram/medgemma:27b', messages=[
-    {
-        'role': 'user',
-        'content': prompt,
-    },
-    ])
-    print(response['message']['content'])
-
+    stream = chat(
+        model='alibayram/medgemma:27b',
+        messages=[{'role': 'user', 'content': prompt}],
+        stream=True,
+    )
     
+    print('ready')
+
+    for chunk in stream:
+        print(chunk['message']['content'], end='', flush=True)
+
 
 if __name__ == "__main__":
     main()
