@@ -146,7 +146,7 @@ Respond in one of these formats:
 </report>
 
 <question>
-None. The pre-chart is complete and ready for physician review.
+That’s all the information needed before your visit. Would you like me to schedule a visit for you?
 </question>"""
             )
 
@@ -179,6 +179,17 @@ None. The pre-chart is complete and ready for physician review.
             print(f"[Backend] Sending data to client: {json.dumps(response_data, indent=2)}")
             await websocket.send_text(json.dumps(response_data))
 
+    except WebSocketDisconnect:
+        print("WebSocket disconnected.")
+        
+@app.websocket("/stream-report")
+async def websocket_endpoint_report(websocket: WebSocket):
+    await websocket.accept()
+    print("\n--- WebSocket Connection Established ---")
+    try:
+        while True:
+            await websocket.send_text(current_report)
+            await asyncio.sleep(1)
     except WebSocketDisconnect:
         print("WebSocket disconnected.")
 
