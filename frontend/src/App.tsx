@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, FormEvent, ChangeEvent, MouseEvent } from 'react'
 import './App.css'
 
 type Message =
@@ -15,24 +15,56 @@ function App() {
   const chatEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // WebSocket state
+  const ws = useRef<WebSocket | null>(null)
+  const [isConnecting, setIsConnecting] = useState(true)
+  const [isConnected, setIsConnected] = useState(false)
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const handleSend = (e?: React.FormEvent) => {
+  useEffect(() => {
+    // Connect to WebSocket
+    ws.current = new WebSocket('ws://localhost:8006/stream-patient')
+    ws.current.onopen = () => {
+      setIsConnecting(false)
+      setIsConnected(true)
+      ws.current?.send('start')
+    }
+    ws.current.onclose = () => {
+      setIsConnecting(false)
+      setIsConnected(false)
+    }
+    ws.current.onmessage = (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.question) {
+          setMessages((msgs: Message[]) => [...msgs, { sender: 'bot', text: data.question }])
+          setIsBotTyping(false)
+        }
+        // Optionally handle other fields like 'report' if needed
+      } catch (e) {
+        // fallback: treat as plain text
+        setMessages((msgs: Message[]) => [...msgs, { sender: 'bot', text: event.data }])
+        setIsBotTyping(false)
+      }
+    }
+    return () => {
+      ws.current?.close()
+    }
+  }, [])
+
+  const handleSend = (e?: FormEvent) => {
     if (e) e.preventDefault()
-    if (!input.trim()) return
+    if (!input.trim() || !ws.current || ws.current.readyState !== WebSocket.OPEN) return
     setMessages([...messages, { sender: 'user', text: input }])
+    ws.current.send(input)
     setInput('')
     setIsBotTyping(true)
-    // Simulate bot response with longer delay
-    setTimeout(() => {
-      setMessages(msgs => [...msgs, { sender: 'bot', text: "I'm just a demo bot!" }])
-      setIsBotTyping(false)
-    }, 1800)
   }
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
@@ -56,9 +88,9 @@ function App() {
             className="w-12 h-12 cursor-pointer"
             onClick={() => window.location.reload()}
             style={{ transition: 'transform 0.2s' }}
-            onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.93)')}
-            onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
-            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseDown={(e: MouseEvent<SVGSVGElement>) => (e.currentTarget.style.transform = 'scale(0.93)')}
+            onMouseUp={(e: MouseEvent<SVGSVGElement>) => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseLeave={(e: MouseEvent<SVGSVGElement>) => (e.currentTarget.style.transform = 'scale(1)')}
           >
             <circle cx="32" cy="32" r="32" fill="#142850"/>
             <ellipse cx="32" cy="38" rx="16" ry="10" fill="#fff" fillOpacity="0.9"/>
@@ -71,9 +103,9 @@ function App() {
             className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent drop-shadow-lg select-none cursor-pointer"
             onClick={() => window.location.reload()}
             style={{ transition: 'transform 0.2s' }}
-            onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.93)')}
-            onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
-            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseDown={(e: MouseEvent<HTMLSpanElement>) => (e.currentTarget.style.transform = 'scale(0.93)')}
+            onMouseUp={(e: MouseEvent<HTMLSpanElement>) => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseLeave={(e: MouseEvent<HTMLSpanElement>) => (e.currentTarget.style.transform = 'scale(1)')}
           >
             MedMind
           </span>
@@ -95,20 +127,20 @@ function App() {
             <div className="flex flex-row gap-6">
               <button
                 className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-                onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to contact my doctor.' }]); setIsBotTyping(true); setTimeout(() => { setMessages(msgs => [...msgs, { sender: 'bot', text: "I'm just a demo bot!" }]); setIsBotTyping(false); }, 1800); }}
+                onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to contact my doctor.' }]); setIsBotTyping(true); }}
               >
                 Contact doctor
               </button>
               <button
                 className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-                onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to view my lab results.' }]); setIsBotTyping(true); setTimeout(() => { setMessages(msgs => [...msgs, { sender: 'bot', text: "I'm just a demo bot!" }]); setIsBotTyping(false); }, 1800); }}
+                onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to view my lab results.' }]); setIsBotTyping(true); }}
               >
                 View results
               </button>
             </div>
             <button
               className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-              onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to refill my prescriptions.' }]); setIsBotTyping(true); setTimeout(() => { setMessages(msgs => [...msgs, { sender: 'bot', text: "I'm just a demo bot!" }]); setIsBotTyping(false); }, 1800); }}
+              onClick={() => { setShowPromptBar(true); setMessages([...messages, { sender: 'user', text: 'I want to refill my prescriptions.' }]); setIsBotTyping(true); }}
             >
               Refill prescriptions
             </button>
@@ -178,8 +210,8 @@ function App() {
               type="text"
               placeholder="Type your message..."
               value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) handleSend() }}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter' && !e.shiftKey) handleSend() }}
             />
             <button
               type="submit"
