@@ -1,7 +1,7 @@
-import MedicalChat from 'components/MedicalChat'
+import PreChartReport from 'components/PreChartReport'
 
 function App() {
-  return <MedicalChat />
+  return <PreChartReport />
 }
 
 export default App
