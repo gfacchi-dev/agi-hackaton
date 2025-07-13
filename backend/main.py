@@ -14,6 +14,8 @@ import json
 import re
 import time
 
+from create_calendar_event import create_calendar_event
+
 class PreChartParser(BaseOutputParser):
     def parse(self, text: str) -> dict:
         report_match = re.search(r"<report>(.*?)</report>", text, re.DOTALL)
@@ -44,6 +46,7 @@ app.add_middleware(
 text = open("assets/pre-chart-initial.md").read()
 current_report = text
 previous_questions = []
+scheduler_trigger = False
 
 async def generate_summary_stream():
     """Generator function to stream the Ollama response."""
@@ -81,7 +84,7 @@ async def generate_summary_endpoint_really_fake():
 
 @app.websocket("/stream-patient")
 async def websocket_endpoint(websocket: WebSocket):
-    global current_report, previous_questions
+    global current_report, previous_questions, scheduler_trigger
     await websocket.accept()
     print("\n--- WebSocket Connection Established ---")
 
@@ -92,11 +95,13 @@ async def websocket_endpoint(websocket: WebSocket):
             print(f"\n[Backend] Received patient response: {patient_response}")
 
             if patient_response == "start":
-                current_report = text  # Reset the report to initial state
+                current_report = ""  # Reset the report to initial state
                 previous_questions = []
+                scheduler_trigger = False
                 continue
 
             if patient_response == "FAKE":
+                current_report = text
                 response_data = {
                     "report": current_report, # Send the cleaned and stored report
                     "question": "Happy to help you! Please provide me with an image showing your symptoms and provide some details about your condition."
@@ -107,6 +112,30 @@ async def websocket_endpoint(websocket: WebSocket):
                 await websocket.send_text(json.dumps(response_data))
                 continue
 
+            if scheduler_trigger == True:
+                create_calendar_event(patient_response)  # Call the function to create a calendar event
+                #TODO: use COMPOSIO to schedule the visit
+                response_data = {
+                    "report": current_report, # Send the cleaned and stored report
+                    "question": "We just sent you an invite. Please let us know if you have any other questions or concerns."
+                }
+                await websocket.send_text(json.dumps(response_data))
+                scheduler_trigger = False  # Reset the trigger after sending
+                continue
+            
+            if len(previous_questions) > 0:
+                server_msg = previous_questions[-1]
+
+                if ("schedule" in patient_response.lower() and "visit" in patient_response.lower()) or ("schedule" in server_msg and "visit" in server_msg):
+                    print("[Backend] Scheduling visit triggered by patient response.")
+                    response_data = {
+                        "report": current_report, # Send the cleaned and stored report
+                        "question": "What day and time would you be available? Our friends from Composio will send you a calendar invite."
+                    }
+                    scheduler_trigger = True
+                    await websocket.send_text(json.dumps(response_data))
+                    continue
+            
             # Append the previous question and patient answer for context
             if previous_questions:
                 last_question = previous_questions[-1]
@@ -137,8 +166,6 @@ Follow these strict rules:
 2. Only include facts directly confirmed by the patient or safely inferred. No assumptions or placeholders.
 3. Use plain, patient-friendly language. Avoid clinical jargon, diagnostic terms, or frameworks like ABCDE.
 4. No future plans, interpretations, or medical advice.
-5. If the report is incomplete, ask one atomic, plain-language question (no multi-part or compound questions).
-6. If the report is complete and ready for physician review, state that no further questions are needed.
 
 Respond in one of these formats:
 

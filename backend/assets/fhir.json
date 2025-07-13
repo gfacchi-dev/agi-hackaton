@@ -6,8 +6,8 @@
         "resource": {
           "resourceType": "Patient",
           "id": "patient-001",
-          "name": [{ "use": "official", "family": "Doe", "given": ["Jane"] }],
-          "gender": "female",
+          "name": [{ "use": "official", "family": "Benito", "given": ["Patrick"] }],
+          "gender": "male",
           "birthDate": "1983-04-12"
         }
       },

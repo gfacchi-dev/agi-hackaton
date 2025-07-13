@@ -126,26 +126,52 @@ function App() {
           <div className="flex flex-col items-center gap-6">
             <div className="flex flex-row gap-6">
               <button
-                className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-                onClick={() => {
-                  setShowPromptBar(true);
-                  setMessages([...messages, { sender: 'user', text: 'I want to contact my doctor.' }]);
-                  setIsBotTyping(true);
-                  if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-                    ws.current.send('FAKE');
+                className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium animate-fadeInBlue"
+                onClick={e => {
+                  const parent = (e.currentTarget.closest('.flex.flex-col.items-center.gap-6') as HTMLElement);
+                  if (parent) {
+                    parent.classList.add('animate-buttonExitFast');
+                    setTimeout(() => {
+                      setShowPromptBar(true);
+                      setMessages([...messages, { sender: 'user', text: 'I want to contact my doctor.' }]);
+                      setIsBotTyping(true);
+                      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                        ws.current.send('FAKE');
+                      }
+                    }, 300);
+                  } else {
+                    setShowPromptBar(true);
+                    setMessages([...messages, { sender: 'user', text: 'I want to contact my doctor.' }]);
+                    setIsBotTyping(true);
+                    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                      ws.current.send('FAKE');
+                    }
                   }
                 }}
               >
                 Contact doctor
               </button>
               <button
-                className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-                onClick={() => {
-                  setShowPromptBar(true);
-                  setMessages([...messages, { sender: 'user', text: 'I want to view my lab results.' }]);
-                  setIsBotTyping(true);
-                  if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-                    ws.current.send('FAKE');
+                className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium animate-fadeInBlue"
+                onClick={e => {
+                  const parent = (e.currentTarget.closest('.flex.flex-col.items-center.gap-6') as HTMLElement);
+                  if (parent) {
+                    parent.classList.add('animate-buttonExitFast');
+                    setTimeout(() => {
+                      setShowPromptBar(true);
+                      setMessages([...messages, { sender: 'user', text: 'I want to view my lab results.' }]);
+                      setIsBotTyping(true);
+                      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                        ws.current.send('FAKE');
+                      }
+                    }, 300);
+                  } else {
+                    setShowPromptBar(true);
+                    setMessages([...messages, { sender: 'user', text: 'I want to view my lab results.' }]);
+                    setIsBotTyping(true);
+                    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                      ws.current.send('FAKE');
+                    }
                   }
                 }}
               >
@@ -153,13 +179,26 @@ function App() {
               </button>
             </div>
             <button
-              className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium"
-              onClick={() => {
-                setShowPromptBar(true);
-                setMessages([...messages, { sender: 'user', text: 'I want to refill my prescriptions.' }]);
-                setIsBotTyping(true);
-                if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-                  ws.current.send('FAKE');
+              className="px-10 py-5 rounded-full bg-[#1a2947] text-white text-xl shadow-xl hover:bg-white hover:text-[#142850] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 border border-[#27496d] hover:scale-110 font-medium animate-fadeInBlue"
+              onClick={e => {
+                const parent = (e.currentTarget.closest('.flex.flex-col.items-center.gap-6') as HTMLElement);
+                if (parent) {
+                  parent.classList.add('animate-buttonExitFast');
+                  setTimeout(() => {
+                    setShowPromptBar(true);
+                    setMessages([...messages, { sender: 'user', text: 'I want to refill my prescriptions.' }]);
+                    setIsBotTyping(true);
+                    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                      ws.current.send('FAKE');
+                    }
+                  }, 300);
+                } else {
+                  setShowPromptBar(true);
+                  setMessages([...messages, { sender: 'user', text: 'I want to refill my prescriptions.' }]);
+                  setIsBotTyping(true);
+                  if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                    ws.current.send('FAKE');
+                  }
                 }
               }}
             >
@@ -271,5 +310,29 @@ export default App
 }
 .animate-fadeInUp {
   animation: fadeInUp 2.2s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes buttonExit {
+  0% { opacity: 1; transform: scale(1) translateY(0); }
+  60% { opacity: 0.7; transform: scale(0.97) translateY(10px); }
+  100% { opacity: 0; transform: scale(0.9) translateY(60px); pointer-events: none; }
+}
+.animate-buttonExit {
+  animation: buttonExit 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes buttonExitFast {
+  0% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.9) translateY(60px); pointer-events: none; }
+}
+.animate-buttonExitFast {
+  animation: buttonExitFast 0.3s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+// For slow fade in, keep .animate-fadeInBlue as:
+@keyframes fadeInBlue {
+  0% { opacity: 0; transform: scale(0.95); background: #000; }
+  60% { opacity: 1; background: #1a2947; }
+  100% { opacity: 1; transform: scale(1); background: #1a2947; }
+}
+.animate-fadeInBlue {
+  animation: fadeInBlue 1.2s cubic-bezier(0.4,0,0.2,1);
 }
 */

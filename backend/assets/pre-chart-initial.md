@@ -1,9 +1,9 @@
 **Pre-Chart Summary**
 
 **Patient Demographics:**
-* Name: Jane Doe
+* Name: Patrick Benito
 * Age: 40 years (DOB: 1983-04-12)
-* Gender: Female
+* Gender: Male
 
 **Reason for Visit / Chief Complaint:**
 * Patient concern regarding a changing lesion on the upper left shoulder, noting irregular edges, patchy color, and possible size increase. Occasional itching is present, but no pain.
