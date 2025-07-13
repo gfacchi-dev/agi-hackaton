@@ -6,7 +6,7 @@
 * Gender: Male
 
 **Reason for Visit / Chief Complaint:**
-* Patient concern regarding a changing lesion on the upper left shoulder, noting irregular edges, patchy color, and possible size increase. Occasional itching is present, but no pain.
+* Patient concern regarding a changing lesion on the upper left shoulder, noting irregular edges, brown and patchy ins color, and possible size increase. Occasional itching is present, but no pain.
 
 **Active Medical History:**
 * Diabetes mellitus type 2 (diagnosed 2019-06-15)
