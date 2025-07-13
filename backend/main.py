@@ -15,6 +15,7 @@ import re
 import time
 
 from create_calendar_event import create_calendar_event
+from update_google_docs import update_google_docs
 
 class PreChartParser(BaseOutputParser):
     def parse(self, text: str) -> dict:
@@ -47,35 +48,6 @@ text = open("assets/pre-chart-initial.md").read()
 current_report = text
 previous_questions = []
 scheduler_trigger = False
-
-async def generate_summary_stream():
-    """Generator function to stream the Ollama response."""
-    prompt = get_prompt()
-    if prompt is None:
-        yield "Error creating prompt."
-        return
-
-    stream = chat(
-        model='alibayram/medgemma:27b',
-        messages=[{'role': 'user', 'content': prompt}],
-        stream=True,
-    )
-
-    for chunk in stream:
-        yield chunk['message']['content']
-
-async def generate_summary():
-    """Function to get the full Ollama response."""
-    prompt = get_prompt()
-    if prompt is None:
-        return "Error creating prompt."
-
-    response = chat(
-        model='alibayram/medgemma:27b',
-        messages=[{'role': 'user', 'content': prompt}],
-        stream=False,
-    )
-    return response['message']['content']
 
 @app.get("/really-fake", response_class=PlainTextResponse)
 async def generate_summary_endpoint_really_fake():
@@ -114,6 +86,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             if scheduler_trigger == True:
                 create_calendar_event(patient_response)  # Call the function to create a calendar event
+                update_google_docs(current_report)
                 #TODO: use COMPOSIO to schedule the visit
                 response_data = {
                     "report": current_report, # Send the cleaned and stored report

@@ -20,6 +20,7 @@ def create_calendar_event(task: str) -> str:
     result = agent_executor.invoke({"input": f"{task} San Francisco Time, year 2025. The title is Medmind Appointment"})
     return result
 
+
 if __name__ == "__main__":
     task = "Create a calendar event for a meeting with John Doe on March 15, 2024, at 10 AM."
     response = create_calendar_event(task)
